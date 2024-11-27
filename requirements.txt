@@ -1,0 +1,4 @@
+flask==3.*
+prometheus_client==0.*
+boto3==1.*
+apscheduler==3.*
