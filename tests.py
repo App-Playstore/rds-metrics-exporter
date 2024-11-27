@@ -5,6 +5,8 @@ from exporter import (
     get_instances, update_metrics, engine_version_gauge, rds_client
 )
 
+AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY = "AWS_SECRET_ACCESS_KEY"
 
 class TestExporter(unittest.TestCase):
 
