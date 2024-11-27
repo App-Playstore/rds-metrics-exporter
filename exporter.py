@@ -7,13 +7,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 app = Flask(__name__)
 engine_version_gauge = Gauge('custom_engine_version', 'RDS Engine Version', ['instance_identifier'])
 
-AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID' 'awsaccesskey')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY' 'awssecretkey')
 REGION = os.getenv('REGION','eu-west-1')
-
-if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
-    print("Error: AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables are required.")
-    exit(1)
 
 rds_client = boto3.client(
     'rds',
