@@ -1,0 +1,82 @@
+name: RDS Metrics Exporter
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+  test:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    name: Python test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        python -m unittest tests.py
+
+    - name: Check App Version
+      id: check_version
+      run: |
+        VERSION=$(python -c "from version import __version__; print(__version__)")
+        if docker pull ogechibogu/rds-metrics-exporter:$(echo $VERSION); then
+          echo "Version $VERSION already exists in Docker. Update version.py"
+          exit 1
+        else
+          echo "Version $VERSION not in Docker. Proceed with build.."
+        fi
+
+  build_and_release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: Build and Release
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Docker Image
+      run: |
+        VERSION=$(python -c "from version import __version__; print(__version__)")
+        docker build -t ogechibogu/rds-metrics-exporter:$VERSION -t ogechibogu/rds-metrics-exporter:latest --platform linux/amd64 .
+
+    - name: Push Docker Image
+      run: |
+        VERSION=$(python -c "from version import __version__; print(__version__)")
+        docker push ogechibogu/rds-metrics-exporter:$VERSION
+        docker push ogechibogu/rds-metrics-exporter:latest
+
+    - name: Get Version for Release
+      id: get_version
+      run: |
+        VERSION=$(python -c "from version import __version__; print(__version__)")
+        echo "::set-output name=version::$VERSION"
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.get_version.outputs.version }}
+        release_name: Release ${{ steps.get_version.outputs.version }}
+        body: |
+          Changes in this release...
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
