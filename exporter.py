@@ -37,7 +37,7 @@ def start_scheduler():
 
 @app.route('/metrics')
 def metrics():
-    return generate_latest()
+    return generate_latest(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 if __name__ == '__main__':
     start_scheduler()
