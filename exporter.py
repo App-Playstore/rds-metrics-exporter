@@ -28,7 +28,7 @@ def update_metrics():
     for instance in instances:
         instance_identifier = instance['DBInstanceIdentifier']
         engine_version = instance['EngineVersion']
-        engine_version_gauge.labels(instance_identifier=instance_identifier).set(float(engine_version.split('.')[0]))
+        engine_version_gauge.labels(instance_identifier=instance_identifier).set(engine_version)
 
 def start_scheduler():
     scheduler = BackgroundScheduler()
