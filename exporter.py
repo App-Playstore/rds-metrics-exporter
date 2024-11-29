@@ -28,12 +28,19 @@ def update_metrics():
     for instance in instances:
         instance_identifier = instance['DBInstanceIdentifier']
         engine_version = instance['EngineVersion']
-        engine_version_gauge.labels(instance_identifier=instance_identifier).set(engine_version)
+        normalized_version = normalize_version(engine_version)
+        engine_version_gauge.labels(instance_identifier=instance_identifier).set(normalized_version)
 
 def start_scheduler():
     scheduler = BackgroundScheduler()
     scheduler.add_job(func=update_metrics, trigger='interval', seconds=15)
     scheduler.start()
+
+def normalize_version(version):
+    parts = version.split('.')
+    if len(parts) == 2:
+        parts[1] = f"{int(parts[1]):02}"
+    return '.'.join(parts)
 
 @app.route('/metrics')
 def metrics():
