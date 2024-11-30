@@ -25,6 +25,12 @@ def get_instances():
 
 def update_metrics():
     instances = get_instances()
+
+    current_identifiers = {instance['DBInstanceIdentifier'] for instance in instances}
+    for existing_label in list(engine_version_gauge._metrics.keys()):
+        if existing_label[0] not in current_identifiers:
+            engine_version_gauge.remove(*existing_label)
+
     for instance in instances:
         instance_identifier = instance['DBInstanceIdentifier']
         engine_version = instance['EngineVersion']
