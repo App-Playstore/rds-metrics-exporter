@@ -13,7 +13,8 @@ class TestExporter(unittest.TestCase):
             'DBInstances': [
                 {
                     'DBInstanceIdentifier': 'my-db-instance',
-                    'EngineVersion': '16.3'
+                    'EngineVersion': '16.3',
+                    'Engine': 'postgres'
                 }
             ]
         }
@@ -28,7 +29,8 @@ class TestExporter(unittest.TestCase):
             'DBInstances': [
                 {
                     'DBInstanceIdentifier': 'my-db-instance',
-                    'EngineVersion': '16.3'
+                    'EngineVersion': '16.3',
+                    'Engine': 'postgres'
                 }
             ]
         }
@@ -40,5 +42,6 @@ class TestExporter(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
 
 
