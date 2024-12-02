@@ -11,6 +11,7 @@ AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID' 'awsaccesskey')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY' 'awssecretkey')
 REGION = os.getenv('REGION','eu-west-1')
 
+
 rds_client = boto3.client(
     'rds',
     region_name=REGION,
@@ -33,8 +34,9 @@ def update_metrics():
 
     for instance in instances:
         instance_identifier = instance['DBInstanceIdentifier']
+        engine_type = instance['Engine']
         engine_version = instance['EngineVersion']
-        normalized_version = normalize_version(engine_version)
+        normalized_version = normalize_version(engine_version, engine_type)
         engine_version_gauge.labels(instance_identifier=instance_identifier).set(normalized_version)
 
 def start_scheduler():
@@ -42,11 +44,14 @@ def start_scheduler():
     scheduler.add_job(func=update_metrics, trigger='interval', seconds=15)
     scheduler.start()
 
-def normalize_version(version):
-    parts = version.split('.')
-    if len(parts) == 2:
-        parts[1] = f"{int(parts[1]):02}"
-    return '.'.join(parts)
+def normalize_version(version, engine_type):
+    if engine_type.lower() == 'postgres':
+        parts = version.split('.')
+        if len(parts) == 2:
+            parts[1] = f"{int(parts[1]):02}"
+        return '.'.join(parts)
+    else:
+        return version
 
 @app.route('/metrics')
 def metrics():
