@@ -29,7 +29,7 @@ class TestExporter(unittest.TestCase):
             'DBInstances': [
                 {
                     'DBInstanceIdentifier': 'my-db-instance',
-                    'EngineVersion': '16.3'
+                    'EngineVersion': '16.3',
                     'Engine': 'postgres'
                 }
             ]
