@@ -34,7 +34,6 @@ def update_metrics():
 
     for instance in instances:
         instance_identifier = instance['DBInstanceIdentifier']
-        engine_type = instance['Engine']
         engine_version = instance['EngineVersion']
         normalized_version = normalize_version(engine_version, engine_type)
         engine_version_gauge.labels(instance_identifier=instance_identifier).set(normalized_version)
@@ -44,14 +43,14 @@ def start_scheduler():
     scheduler.add_job(func=update_metrics, trigger='interval', seconds=15)
     scheduler.start()
 
-def normalize_version(version, engine_type):
-    if engine_type.lower() == 'postgres':
-        parts = version.split('.')
-        if len(parts) == 2:
-            parts[1] = f"{int(parts[1]):02}"
-        return '.'.join(parts)
+def normalize_version(version):
+    parts = version.split('.')
+    if len(parts) >= 2:
+        parts[1] = f"{int(parts[1]):02}"
+        return float(f"{parts[0]}.{parts[1]}")
     else:
-        return version
+        return float(parts[0])
+  
 
 @app.route('/metrics')
 def metrics():
