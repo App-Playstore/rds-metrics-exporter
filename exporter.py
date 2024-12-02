@@ -35,7 +35,7 @@ def update_metrics():
     for instance in instances:
         instance_identifier = instance['DBInstanceIdentifier']
         engine_version = instance['EngineVersion']
-        normalized_version = normalize_version(engine_version, engine_type)
+        normalized_version = normalize_version(engine_version)
         engine_version_gauge.labels(instance_identifier=instance_identifier).set(normalized_version)
 
 def start_scheduler():
